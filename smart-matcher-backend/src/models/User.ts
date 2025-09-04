@@ -26,11 +26,3 @@ const UserSchema: Schema = new Schema<IUser>({
 
 // model Creation
 export default mongoose.model<IUser>("User", UserSchema);
- driverId: Types.ObjectId;
- origin:
- destination:string
- date: Date;
- seatsAvailable: number;
- price: number；
- status: "open" | "full" | "cancelled";
- createdAt: Date

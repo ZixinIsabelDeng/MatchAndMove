@@ -14,9 +14,14 @@ const CarpoolRideSchema: Schema = new Schema<ICarPoolRide>({
   origin: { type: String, required: true },
   destination: { type: String, required: true },
   departure: { type: Date, required: true },
-  seatsAvailable: { type: Number, required: true },
+  seatsAvailable: { type: Number, required: true, min: 0 },
   price: { type: Number, required: true },
-  status: { type: String, enum: ["open", "full", "cancelled"], required: true },
+  status: {
+    type: String,
+    enum: ["open", "full", "cancelled"],
+    default: "open",
+    required: true,
+  },
   createdAt: { type: Date, default: Date.now },
 });
 export default mongoose.model<ICarPoolRide>("CarpoolRide", CarpoolRideSchema);

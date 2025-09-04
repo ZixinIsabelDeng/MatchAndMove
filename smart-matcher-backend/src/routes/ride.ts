@@ -10,8 +10,8 @@ const router = Router();
  */
 
 // we attach the authMiddleware to the route to ensure that the user is authenticated
-
-router.post("/add", authMiddleware, async (req: AuthRequest, res: Response) => {
+// create the ride
+router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   const { origin, destination, date, seatsAvailable, price } = req.body;
   const driverId = req.user?.id;
   if (!driverId) {
@@ -29,6 +29,7 @@ router.post("/add", authMiddleware, async (req: AuthRequest, res: Response) => {
   res.status(201).json(newRide);
 });
 
+// find the available ride
 router.get("/", async (req: Request, res: Response) => {
   try {
     const { origin, destination, date, timeFrom, timeTo } = req.query;
@@ -76,5 +77,40 @@ router.get("/", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to fetch rides", details: err });
   }
 });
+/**
+ * POST /rides/:id/request
+ * Rider requests a seat in a ride
+ */
+router.post(
+  "/:id/request",
+  authMiddleware,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const ride = await CarpoolRide.findById(req.params.id);
+
+      if (!ride) {
+        return res.status(404).json({ message: "Ride not found" });
+      }
+
+      if (ride.status != "open") {
+        return res.status(400).json({ message: `Ride is ${ride.status}` });
+      }
+
+      // check seats
+      if (ride.seatsAvailable == 0) {
+        ride.status = "full";
+        await ride.save();
+        return res.status(400).json({ message: "No seats available" });
+      }
+
+      ride.seatsAvailable -= 1;
+
+      await ride.save();
+      res.json({ message: "Seat requested successfully", ride });
+    } catch (err) {
+      res.status(500).json({ message: "Something went wrong" });
+    }
+  }
+);
 
 export default router;
