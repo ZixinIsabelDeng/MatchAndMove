@@ -2,6 +2,7 @@
 // request - the HTTP response request obhect (things like req.body,req.params)
 // response -http response object like res.json(). res.send
 import express, { Application, Request, Response } from "express";
+import logisticsRoutes from "./routes/logistics";
 // library connects and interact with MongoDB
 import mongoose from "mongoose";
 //cors origin resource sharing
@@ -28,6 +29,8 @@ app.use(cors());
 // make Express parse JSON request
 // without this req.body would be undefined
 app.use(express.json);
+
+app.use("/logistics", logisticsRoutes);
 
 app.use("/auth", authRoutes);
 //create a simple get routes,

@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import CarpoolRide from "../models/CarpoolRide";
 import { authMiddleware, AuthRequest } from "../middleware/auth";
+import Match from "../models/Match";
 
 const router = Router();
 
@@ -107,6 +108,15 @@ router.post(
 
       await ride.save();
       res.json({ message: "Seat requested successfully", ride });
+
+      //save match
+      const match = new Match({
+        type: "carpool",
+        riderId: req.user?.id,
+        rideId: ride._id,
+      });
+      await match.save();
+      res.json({ message: "Seated requested & match created", ride, match });
     } catch (err) {
       res.status(500).json({ message: "Something went wrong" });
     }
